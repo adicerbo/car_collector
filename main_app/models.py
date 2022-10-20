@@ -8,12 +8,22 @@ SERVICE = (
     ('F', 'Fuel Filter')
 )
 
+class Fluid(models.Model):
+    name = models.CharField(max_length=50)
+    weight = models.CharField(max_length=30)
+
+    def get_absolute_url(self):
+        return reverse('fluids_detail', kwargs={'pk': self.id})
+
+
 class Car(models.Model):
     make = models.CharField(max_length=30)
     year = models.IntegerField()
     model = models.CharField(max_length=30)
     trim = models.CharField(max_length=30)
     mileage = models.IntegerField()
+    # add many to many relationship
+    fluids = models.ManyToManyField(Fluid)
 
     def __str__(self):
         return self.model
@@ -33,3 +43,7 @@ class Maintain(models.Model):
 
     def __str__(self):
         return f"{self.get_service_display()} on {self.date}"
+    
+    # sort by most recent date of service
+    class Meta:
+        ordering = ['-date']

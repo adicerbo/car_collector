@@ -10,6 +10,7 @@
     <title>car Collector</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" />
     <link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 </head>
 
 <body>
@@ -25,6 +26,8 @@
                     <li><a href="{% url 'about' %}">About</a></li>
                     <li><a href="{% url 'cars_create' %}">Add a Car</a></li>
                     <li><a href="{% url 'index' %}">View My Cars</a></li>
+                    <li><a href="{% url 'fluids_create' %}">Add a Fluid</a></li>
+                    <li><a href="{% url 'fluids_index' %}">View Fluids</a></li>
                 </ul>
             </div>
         </nav>

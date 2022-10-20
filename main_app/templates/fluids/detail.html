@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>Fluid Details</h1>
+
+
+<div class="card">
+    <a href="{% url 'fluids_detail' fluid.id %}">
+        <div class="card-content">
+            <span class="card-title"><span class="{{ fluid.name.lower }}-text">{{ fluid.name }}: {{ fluid.weight }}</span></span>
+        </div>
+        <div class="card-action">
+            <a href="{% url 'fluids_update' fluid.id %}">Edit</a>
+            <a href="{% url 'fluids_delete' fluid.id %}">Delete</a>
+        </div>
+    </a>
+</div>
+
+{% endblock %}

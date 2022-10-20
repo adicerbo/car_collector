@@ -18,6 +18,10 @@
         </div>
     </div>
     <div class="col s6">
+        <form action="{% url 'add_maintain' car.id %}" method="post">
+            {% csrf_token %} {{ maintain_form.as_p }}
+            <input type="submit" class="btn green" value="Add Service" />
+        </form>
         <table class="striped">
             <thead>
                 <tr>
@@ -36,4 +40,54 @@
         </table>
     </div>
 </div>
-{% endblock %}
+<hr />
+<div class="row">
+    <div class="col s6">
+        <h3>{{ car.model }} Fluids</h3>
+        {% if car.fluids.count %} {% for fluid in car.fluids.all %}
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">
+                    <span class="{{ fluid.weight }}">{{ fluid.name }}: {{ fluid.weight }}</span>
+                </span>
+            </div>
+        </div>
+        {% endfor %} {% else %}
+        <h5>No Fluids :(</h5>
+        {% endif %}
+    </div>
+    <div class="col s6">
+        <h3>Available Fluids</h3>
+        {% if fluids.count %}
+        {% for fluid in fluids.all %}
+        <div class="card">
+            <div class="card-content">
+                <span class="card-title">
+                    <span class="{{ fluid.weight }}--text">{{ fluid.weight }}</span> {{ fluid.name }}
+                </span>
+            </div>
+            <div class="card-action">
+                <form action="{% url 'assoc_fluid' car.id fluid.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn">Add</button>
+                </form>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <h5>{{cat.name}} Already Has All Fluids Available</h5>
+        {% endif %}
+    </div>
+    <script>
+        var dateEl = document.getElementById('id_date');
+        M.Datepicker.init(dateEl, {
+            format: 'yyyy-mm-dd',
+            defaultDate: new Date(),
+            setDefaultDate: true,
+            autoClose: true
+        });
+        // additional JS to intialize select
+        var selectEl = document.getElementById('id_service');
+        M.FormSelect.init(selectEl)
+    </script>
+    {% endblock %}
