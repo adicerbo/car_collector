@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.contrib.auth.models import User
 
 SERVICE = (
     ('O', 'Oil Change'),
@@ -24,6 +25,7 @@ class Car(models.Model):
     mileage = models.IntegerField()
     # add many to many relationship
     fluids = models.ManyToManyField(Fluid)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.model

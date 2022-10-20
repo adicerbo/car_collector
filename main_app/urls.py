@@ -16,4 +16,5 @@ urlpatterns = [
     path('fluids/<int:pk>/update/', views.FluidUpdate.as_view(), name='fluids_update'),
     path('fluids/<int:pk>/delete/', views.FluidDelete.as_view(), name='fluids_delete'),
     path('cars/<int:car_id>/assoc_fluid/<int:fluid_id>/', views.assoc_fluid, name='assoc_fluid'),
+    path('accounts/signup', views.signup, name='signup'),
 ]

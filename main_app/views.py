@@ -5,6 +5,10 @@ from django.views.generic.detail import DetailView
 from .models import Car, Fluid
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from .forms import MaintainForm
+from django.contrib.auth import login
+from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 def home(request):
@@ -14,12 +18,13 @@ def home(request):
 def about(request):
     return render(request, 'about.html')
 
-
+@login_required
 def cars_index(request):
-    cars = Car.objects.all()
+    cars = Car.objects.filter(user=request.user)
     return render(request, 'cars/index.html', {'cars': cars})
 
 
+@login_required
 def cars_detail(request, car_id):
     car = Car.objects.get(id=car_id)
     fluids_car_doesnt_have = Fluid.objects.exclude(
@@ -34,6 +39,7 @@ def cars_detail(request, car_id):
     })
 
 
+@login_required
 def add_maintain(request, car_id):
     # create model form using data in request.post
     form = MaintainForm(request.POST)
@@ -47,48 +53,72 @@ def add_maintain(request, car_id):
     return redirect('detail', car_id=car_id)
 
 
+@login_required
 def assoc_fluid(request, car_id, fluid_id):
   # Note that you can pass a fluid's id instead of the whole object
     Car.objects.get(id=car_id).fluids.add(fluid_id)
     return redirect('detail', car_id=car_id)
 
 
-class CarCreate(CreateView):
+
+class CarCreate(LoginRequiredMixin, CreateView):
     model = Car
     fields = ['make', 'year', 'model', 'trim', 'mileage']
-    success_url = '/cars/'
+    def form_valid(self,form):
+        # assign logged in user
+        form.instance.user = self.request.user #form instance is a car
+        return super().form_valid(form)
+    
 
-
-class CarUpdate(UpdateView):
+class CarUpdate(LoginRequiredMixin, UpdateView):
     model = Car
     fields = ['mileage', ]
 
 
-class CarDelete(DeleteView):
+class CarDelete(LoginRequiredMixin, DeleteView):
     model = Car
     success_url = '/cars/'
 
 
-class FluidCreate(CreateView):
+class FluidCreate(LoginRequiredMixin, CreateView):
     model = Fluid
     fields = ('name', 'weight')
 
 
-class FluidUpdate(UpdateView):
+class FluidUpdate(LoginRequiredMixin, UpdateView):
     model = Fluid
     fields = ('name', 'weight')
 
 
-class FluidDelete(DeleteView):
+class FluidDelete(LoginRequiredMixin, DeleteView):
     model = Fluid
     success_url = '/fluids/'
 
 
-class FluidDetail(DetailView):
+class FluidDetail(LoginRequiredMixin, DetailView):
     model = Fluid
     template_name = 'fluids/detail.html'
 
 
-class FluidList(ListView):
+class FluidList(LoginRequiredMixin, ListView):
     model = Fluid
     template_name = 'fluids/index.html'
+
+# SIGNUP VIEW FUNCTION
+def signup(request):
+    error_message = ''
+    if request.method == 'POST':
+        # how to create a user form object that includes the data from the browser
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            # add user to database
+            user = form.save()
+            # log user in
+            login(request, user)
+            return redirect('index')
+        else: 
+            error_message = 'Invalid sign up - try again'
+    # a bad POST or GET, render signup.html with empty form
+    form = UserCreationForm()
+    context = {'form': form, 'error_message': error_message}
+    return render(request, 'registration/signup.html', context)
